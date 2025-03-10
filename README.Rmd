@@ -1,0 +1,62 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# dendrogreif
+
+<!-- badges: start -->
+<!-- badges: end -->
+
+The goal of dendrogreif is to provide an R interface for downloading data from DendroGreif network, containing 1000+ environmental (100+ Temperature and Relative Humidity) and 500+ tree physiological sensor streams (350+ dendrometers). Currently the database is meant for the internal use, but could be opened up to the public if there is enough interest. 
+
+## Installation
+
+You can install the development version of dendrogreif like so:
+
+``` r
+# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+```
+
+You will need credentials file for the database access. Please contact marko.smiljanic@uni-greifswald.de for the access rights.
+
+## Example
+
+Common workflow entails looking up the site id from the sites database, getting either all or some locations from it and at the end getting the relevant data series. 
+
+```{r example, message=FALSE}
+library(dendrogreif)
+
+## initialize database connection from credentials file.
+conn <- con_init("creds")
+
+#list all sites in the database
+list_sites(conn)
+
+#list all locations for a single site
+demmin_locations <- list_locations(conn, 6)
+demmin_locations %>% head(20) %>% knitr::kable()
+#get single tree dendrometer
+data_ind <- get_data(conn, location_ids = 67, variable_ids = 1)
+print(head(data_ind))
+
+#get all dendrometer series from the single site
+data_all_dend <- get_data(conn, location_ids = get_locations(conn, site_ids=6), variable_ids = 1)
+print(head(data_all_dend))
+
+#get all series from the single site
+loc_ids <- get_locations(con = conn, site_ids=6)
+var_ids <- get_variables(con = conn , location_ids = loc_ids)
+data_all <- get_data(conn, location_ids = loc_ids, variable_ids = var_ids)
+print(head(data_all))
+```

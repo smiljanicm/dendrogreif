@@ -1,0 +1,22 @@
+Package: dendrogreif
+Type: Package
+Title: DendroGreif Monitoring Database
+Version: 0.1.3
+Authors@R: c(person(given = "Marko",
+                    family = "Smiljanic",
+                    role = c("aut", "cre"),
+                    email = "marko.smiljanic313@gmail.com"))
+Maintainer: Marko Smiljanic <marko.smiljanic313@gmail.com>
+Description: More about what it does (maybe more than one line)
+    Use four spaces when indenting paragraphs within the Description.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Depends:
+  DBI,
+  RPostgres,
+  dplyr,
+  dendwrang,
+  jsonlite
+Remotes: git::https://github.com/smiljanicm/dendwrang.git
+LazyData: true
+RoxygenNote: 7.3.2
