@@ -18,7 +18,8 @@ interest.
 You can install the development version of dendrogreif like so:
 
 ``` r
-# FILL THIS IN! HOW CAN PEOPLE INSTALL YOUR DEV PACKAGE?
+install.packages("remotes")
+remotes::install_github('smiljanicm/dendrogreif')
 ```
 
 You will need credentials file for the database access. Please contact
