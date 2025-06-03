@@ -24,7 +24,7 @@ con_init <- function(creds = "creds",
     db_name <- ifelse(is.null(db_name),rstudioapi::askForPassword("Please enter your database name"))
     print(db_name)
   } else {
-    cr <- readRenviron("creds")
+    cr <- readRenviron(creds)
     db_name <- Sys.getenv("db_name")
     db_host <- Sys.getenv("db_host")
     db_user <- Sys.getenv("db_user")
