@@ -43,17 +43,18 @@ get_data <- function(con = NULL, location_ids = NULL, variable_ids = NULL, minut
         select(variable_id) %>% unlist()
     }
 
-  clean_sensor <- function(data, clean_df = cdff, locID = 2, varID = 1, clsetID = 1) {
+  clean_sensor <- function(data, clean_df = cdff, locID = 2, varID = 1, clsetID = 1:1000) {
     #cleaning_set_id;location_id;variable_id;c
     clean_df <- clean_df %>%
-      filter(cleaning_set_id == clsetID) %>%
+      filter(cleaning_set_id %in% clsetID) %>%
       filter(location_id == locID) %>%
       filter(variable_id == varID) %>%
       select(correction, arguments)
     out <- data
+    # print('cleandf')
     # print(clean_df)
+    # print('headofout')
     # print(out %>% head())
-    out %>% head() %>% print()
     if(nrow(clean_df) > 0) {
       for(i in 1:nrow(clean_df)){
         corr <- clean_df[[i, "correction"]]
@@ -61,9 +62,15 @@ get_data <- function(con = NULL, location_ids = NULL, variable_ids = NULL, minut
 
         args_list <- fromJSON(args)
         args_list <- c(list(data=out), args_list)
+        print(corr)
+        print(args_list)
         out <- do.call(corr, args_list)
+        # gg <- ggplot(out, aes(x=TIMESTAMP, y=Sensor)) + geom_line()
+        # plot(gg)
       }
     }
+    # print('headofout')
+    # print(out %>% head())
     return(out)
   }
 
@@ -112,7 +119,9 @@ get_data <- function(con = NULL, location_ids = NULL, variable_ids = NULL, minut
     if(toclean != 'raw') {
       # print(toclean)
       # print(res %>% head())
-      cdff <- tbl(con, 'cleaning_instructions') %>% collect()
+#       cdff <- tbl(con, 'cleaning_instructions') %>% collect()
+      cleaning_query <- 'select * from cleaning_instructions order by cleaning_set_id'
+      cdff <- DBI::dbGetQuery(con, cleaning_query)
       if(!is.null(res)) {
         # print(locs)
         # print(vars)
@@ -120,18 +129,18 @@ get_data <- function(con = NULL, location_ids = NULL, variable_ids = NULL, minut
           bind_rows() %>%
           t() %>%
           as.data.frame()
-        # print("comb")
-        # print(comb)
+         print("comb")
+         print(comb)
         #      res_clean <- res %>% distinct(location_id) %>% unlist() %>%
         res_clean <- comb %>% map(function(com) {
           # print("com:")
           # print(com)
           x <- com[[1]]
           v <- com[[2]]
-          # print("x:")
-          # print(x)
-          # print("v:")
-          # print(v)
+           print("x:")
+           print(x)
+           print("v:")
+           print(v)
 
           # t <- res %>% rename("TIMESTAMP" = timestamp) %>%
           #   rename("Sensor" = value) %>%
@@ -145,9 +154,11 @@ get_data <- function(con = NULL, location_ids = NULL, variable_ids = NULL, minut
             filter(location_id == x) %>%
             filter(variable_id == v) #%>%
 #            select(TIMESTAMP, Sensor, location_id)
+          # print('headoft')
           # print(t %>% head())
           t <- t %>%
             clean_sensor(locID = x, varID = v, clean_df = cdff)
+          # print('headoft')
           # print(t %>% head())
           t
         }) %>% bind_rows() %>% rename("timestamp" = TIMESTAMP, "value" = Sensor) %>% arrange(timestamp)
